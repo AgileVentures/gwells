@@ -3,16 +3,9 @@
 # General Jobs #
 ################
 
-default: vue
+default: vue down
 
-vue: prep
-	NPM_CMD=dev docker-compose up -d
-
-api: prep
-	NPM_CMD=build docker-compose up -d
-
-django: prep
-	NPM_CMD=watch docker-compose up -d
+test: test-node test-django
 
 
 ###################
@@ -20,27 +13,24 @@ django: prep
 ###################
 
 prep:
-	@	docker-compose pull
-	@	docker-compose build
-
-fixtures:
-	@	docker exec -ti gwells_api_1 bash -c " \
-			cd /app/backend; \
-			python manage.py migrate; \
-			python manage.py loaddata gwells-codetables.json; \
-			python manage.py loaddata wellsearch-codetables.json registries-codetables.json; \
-			python manage.py loaddata wellsearch.json registries.json; \
-			python manage.py loaddata aquifers.json; \
-			python manage.py createinitialrevisions \
-		" || \
-			echo "Failed.  Please make sure the API container has had time to start."
+	docker-compose pull
+	docker-compose build
 
 down:
-	@	docker-compose down
+	docker-compose down
 
-db-clean:
-	@	docker-compose down || true
-	@	rm -rf ./.tmp/psql-dev
-	@	echo
-	@	echo "Compose is down and the database folder deleted"
-	@	echo
+vue: prep
+	NPM_CMD=dev docker-compose up || true
+
+django: prep
+	NPM_CMD=watch docker-compose up || true
+
+test-node:
+	docker exec -ti gwells_frontend_1 /bin/bash -c "cd /app/frontend/; npm run unit -- --runInBand"
+
+test-django:
+	docker exec -ti gwells_frontend_1 /bin/bash -c "cd /app/frontend/; npm run build"
+	docker exec -ti gwells_backend_1 /bin/bash -c "cd /app/backend/; python manage.py test -c nose.cfg --noinput"
+
+admin-django:
+	docker exec -ti gwells_backend_1 /bin/bash -c "cd /app/backend; python manage.py createsuperuser"

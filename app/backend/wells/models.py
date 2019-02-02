@@ -12,8 +12,6 @@
     limitations under the License.
 """
 from django.db import models
-
-from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 import uuid
@@ -24,7 +22,7 @@ from gwells.models.lithology import (
     LithologyDescriptionCode, LithologyColourCode, LithologyHardnessCode,
     LithologyMaterialCode, BedrockMaterialCode, BedrockMaterialDescriptorCode, LithologyStructureCode,
     LithologyMoistureCode, SurficialMaterialCode)
-from registries.models import Person
+from registries.models import Person, Organization
 from submissions.models import WellActivityCode
 from aquifers.models import Aquifer
 
@@ -502,6 +500,8 @@ class CoordinateAcquisitionCode(AuditModel):
         return self.description
 
 
+# TODO: Consider having Well and Submission extend off a common base class, given that
+#   they mostly have the exact same fields!
 class Well(AuditModel):
     """
     Well information.
@@ -734,10 +734,10 @@ class Well(AuditModel):
     diameter = models.CharField(max_length=9, blank=True)
 
     observation_well_number = models.CharField(
-        max_length=3, blank=True, null=True, verbose_name="Observation Well Number")
+        max_length=30, blank=True, null=True, verbose_name="Observation Well Number")
 
     observation_well_status = models.ForeignKey(
-        ObsWellStatusCode, db_column='obs_well_status_code', blank=True, null="True",
+        ObsWellStatusCode, db_column='obs_well_status_code', blank=True, null=True,
         verbose_name="Observation Well Status", on_delete=models.PROTECT)
 
     ems = models.CharField(max_length=10, blank=True, null=True,
@@ -770,16 +770,81 @@ class Well(AuditModel):
     aquifer = models.ForeignKey(Aquifer, db_column='aquifer_id', on_delete=models.PROTECT, blank=True,
                                 null=True, verbose_name='Aquifer ID Number')
 
-    driller_responsible = models.ForeignKey(Person, db_column='driller_responsible_guid',
-                                            on_delete=models.PROTECT,
-                                            verbose_name='Person Responsible for Drilling',
-                                            null=True, blank=True)
+    person_responsible = models.ForeignKey(Person, db_column='person_responsible_guid',
+                                           on_delete=models.PROTECT,
+                                           verbose_name='Person Responsible for Drilling',
+                                           null=True, blank=True)
+    company_of_person_responsible = models.ForeignKey(
+        Organization, db_column='org_of_person_responsible_guid', on_delete=models.PROTECT,
+        verbose_name='Company of person responsible for drilling', null=True, blank=True)
     driller_name = models.CharField(
         max_length=200, blank=True, null=True, verbose_name='Name of Person Who Did the Work')
     consultant_name = models.CharField(
         max_length=200, blank=True, null=True, verbose_name='Consultant Name')
     consultant_company = models.CharField(
         max_length=200, blank=True, null=True, verbose_name='Consultant Company')
+
+    # Aquifer related data
+    aquifer_vulnerability_index = models.DecimalField(
+        max_digits=10, decimal_places=0, blank=True, null=True, verbose_name='AVI')
+    storativity = models.DecimalField(
+        max_digits=8, decimal_places=7, blank=True, null=True, verbose_name='Storativity')
+    transmissivity = models.DecimalField(
+        max_digits=10, decimal_places=0, blank=True, null=True, verbose_name='Transmissivity')
+    hydraulic_conductivity = models.TextField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Hydraulic Conductivity')
+    specific_storage = models.TextField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Specific Storage')
+    specific_yield = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True, verbose_name='Specific Yield')
+    testing_method = models.TextField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Testing Method')
+    testing_duration = models.PositiveIntegerField(blank=True, null=True)
+    analytic_solution_type = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True, verbose_name='Analytic Solution Type')
+    boundary_effect = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True, verbose_name='Boundary Effect')
+
+    # Production data related data
+    yield_estimation_method = models.ForeignKey(
+        YieldEstimationMethodCode, db_column='yield_estimation_method_code',
+        on_delete=models.CASCADE, blank=True, null=True,
+        verbose_name='Estimation Method')
+    yield_estimation_rate = models.DecimalField(
+        max_digits=7, decimal_places=2, verbose_name='Estimation Rate',
+        blank=True, null=True, validators=[MinValueValidator(Decimal('0.00'))])
+    yield_estimation_duration = models.DecimalField(
+        max_digits=9, decimal_places=2, verbose_name='Estimation Duration',
+        blank=True, null=True, validators=[MinValueValidator(Decimal('0.01'))])
+    static_level_before_test = models.DecimalField(
+        max_digits=7, decimal_places=2, verbose_name='SWL Before Test',
+        blank=True, null=True, validators=[MinValueValidator(Decimal('0.0'))])
+    drawdown = models.DecimalField(
+        max_digits=7, decimal_places=2, blank=True, null=True,
+        validators=[MinValueValidator(Decimal('0.00'))])
+    hydro_fracturing_performed = models.BooleanField(
+        default=False, verbose_name='Hydro-fracturing Performed?',
+        choices=((False, 'No'), (True, 'Yes')))
+    hydro_fracturing_yield_increase = models.DecimalField(
+        max_digits=7, decimal_places=2,
+        verbose_name='Well Yield Increase Due to Hydro-fracturing',
+        blank=True, null=True,
+        validators=[MinValueValidator(Decimal('0.00'))])
+    recommended_pump_depth = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True,
+                                                 verbose_name='Recommended pump depth',
+                                                 validators=[MinValueValidator(Decimal('0.00'))])
+    recommended_pump_rate = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True,
+                                                verbose_name='Recommended pump rate',
+                                                validators=[MinValueValidator(Decimal('0.00'))])
 
     class Meta:
         db_table = 'well'
@@ -936,10 +1001,13 @@ class ActivitySubmission(AuditModel):
                                            verbose_name='Intended Water Use')
     # Driller responsible should be a required field on all submissions, but for legacy well
     # information this may not be available, so we can't enforce this on a database level.
-    driller_responsible = models.ForeignKey(Person, db_column='driller_responsible_guid',
-                                            on_delete=models.PROTECT,
-                                            verbose_name='Person Responsible for Drilling',
-                                            blank=True, null=True)
+    person_responsible = models.ForeignKey(Person, db_column='person_responsible_guid',
+                                           on_delete=models.PROTECT,
+                                           verbose_name='Person Responsible for Drilling',
+                                           blank=True, null=True)
+    company_of_person_responsible = models.ForeignKey(
+        Organization, db_column='org_of_person_responsible_guid', on_delete=models.PROTECT,
+        verbose_name='Company of person responsible for drilling', null=True, blank=True)
     driller_name = models.CharField(
         max_length=200, blank=True, null=True, verbose_name='Name of Person Who Did the Work')
     consultant_name = models.CharField(
@@ -1141,7 +1209,7 @@ class ActivitySubmission(AuditModel):
 
     comments = models.CharField(max_length=3000, blank=True, null=True)
     internal_comments = models.CharField(max_length=3000, blank=True, null=True)
-    
+
     alternative_specs_submitted = models.BooleanField(
         default=False, verbose_name='Alternative specs submitted (if required)')
 
@@ -1150,6 +1218,17 @@ class ActivitySubmission(AuditModel):
     # want to be integer in future
     diameter = models.CharField(max_length=9, blank=True, null=True)
     ems_id = models.CharField(max_length=30, blank=True, null=True)
+
+    # Observation well details
+    observation_well_number = models.CharField(
+        max_length=30, blank=True, null=True, verbose_name="Observation Well Number")
+
+    observation_well_status = models.ForeignKey(
+        ObsWellStatusCode, db_column='obs_well_status_code', blank=True, null=True,
+        verbose_name="Observation Well Status", on_delete=models.PROTECT)
+    # aquifer association
+    aquifer = models.ForeignKey(Aquifer, db_column='aquifer_id', on_delete=models.PROTECT, blank=True,
+                                null=True, verbose_name='Aquifer ID Number')
 
     # Decommission info
     decommission_reason = models.CharField(
@@ -1163,6 +1242,68 @@ class ActivitySubmission(AuditModel):
         max_length=100, blank=True, null=True, verbose_name="Backfill Material")
     decommission_details = models.CharField(
         max_length=250, blank=True, null=True, verbose_name="Decommission Details")
+
+    # Aquifer related data
+    aquifer_vulnerability_index = models.DecimalField(
+        max_digits=10, decimal_places=0, blank=True, null=True, verbose_name='AVI')
+    storativity = models.DecimalField(
+        max_digits=8, decimal_places=7, blank=True, null=True, verbose_name='Storativity')
+    transmissivity = models.DecimalField(
+        max_digits=10, decimal_places=0, blank=True, null=True, verbose_name='Transmissivity')
+    hydraulic_conductivity = models.TextField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Hydraulic Conductivity')
+    specific_storage = models.TextField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Specific Storage')
+    specific_yield = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True, verbose_name='Specific Yield')
+    testing_method = models.TextField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Testing Method')
+    testing_duration = models.PositiveIntegerField(blank=True, null=True)
+    analytic_solution_type = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True, verbose_name='Analytic Solution Type')
+    boundary_effect = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True, verbose_name='Boundary Effect')
+
+    # Production data related data
+    yield_estimation_method = models.ForeignKey(
+        YieldEstimationMethodCode, db_column='yield_estimation_method_code',
+        on_delete=models.CASCADE, blank=True, null=True,
+        verbose_name='Estimation Method')
+    yield_estimation_rate = models.DecimalField(
+        max_digits=7, decimal_places=2, verbose_name='Estimation Rate',
+        blank=True, null=True, validators=[MinValueValidator(Decimal('0.00'))])
+    yield_estimation_duration = models.DecimalField(
+        max_digits=9, decimal_places=2, verbose_name='Estimation Duration',
+        blank=True, null=True, validators=[MinValueValidator(Decimal('0.01'))])
+    static_level_before_test = models.DecimalField(
+        max_digits=7, decimal_places=2, verbose_name='SWL Before Test',
+        blank=True, null=True, validators=[MinValueValidator(Decimal('0.0'))])
+    drawdown = models.DecimalField(
+        max_digits=7, decimal_places=2, blank=True, null=True,
+        validators=[MinValueValidator(Decimal('0.00'))])
+    hydro_fracturing_performed = models.BooleanField(
+        default=False, verbose_name='Hydro-fracturing Performed?',
+        choices=((False, 'No'), (True, 'Yes')))
+    hydro_fracturing_yield_increase = models.DecimalField(
+        max_digits=7, decimal_places=2,
+        verbose_name='Well Yield Increase Due to Hydro-fracturing',
+        blank=True, null=True,
+        validators=[MinValueValidator(Decimal('0.00'))])
+    recommended_pump_depth = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True,
+                                                 verbose_name='Recommended pump depth',
+                                                 validators=[MinValueValidator(Decimal('0.00'))])
+    recommended_pump_rate = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True,
+                                                verbose_name='Recommended pump rate',
+                                                validators=[MinValueValidator(Decimal('0.00'))])
 
     class Meta:
         db_table = 'activity_submission'
@@ -1250,67 +1391,6 @@ class LithologyDescription(AuditModel):
                                                          self.lithology_to)
         else:
             return 'well {} {} {}'.format(self.well, self.lithology_from, self.lithology_to)
-
-
-class ProductionData(AuditModel):
-    """
-    Water production of a well measured by a driller
-    """
-    production_data_guid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False)
-    activity_submission = models.ForeignKey(
-        ActivitySubmission, db_column='filing_number',
-        on_delete=models.CASCADE, blank=True, null=True)
-    well = models.ForeignKey(
-        Well, db_column='well_tag_number', on_delete=models.CASCADE,
-        blank=True, null=True)
-    yield_estimation_method = models.ForeignKey(
-        YieldEstimationMethodCode, db_column='yield_estimation_method_code',
-        on_delete=models.CASCADE, blank=True, null=True,
-        verbose_name='Estimation Method')
-    yield_estimation_rate = models.DecimalField(
-        max_digits=7, decimal_places=2, verbose_name='Estimation Rate',
-        blank=True, null=True, validators=[MinValueValidator(Decimal('0.00'))])
-    yield_estimation_duration = models.DecimalField(
-        max_digits=9, decimal_places=2, verbose_name='Estimation Duration',
-        blank=True, null=True, validators=[MinValueValidator(Decimal('0.01'))])
-    well_yield_unit = models.ForeignKey(
-        WellYieldUnitCode, db_column='well_yield_unit_code', blank=True,
-        null=True, on_delete=models.PROTECT)
-    static_level = models.DecimalField(
-        max_digits=7, decimal_places=2, verbose_name='SWL Before Test',
-        blank=True, null=True, validators=[MinValueValidator(Decimal('0.0'))])
-    drawdown = models.DecimalField(
-        max_digits=7, decimal_places=2, blank=True, null=True,
-        validators=[MinValueValidator(Decimal('0.00'))])
-    hydro_fracturing_performed = models.BooleanField(
-        default=False, verbose_name='Hydro-fracturing Performed?',
-        choices=((False, 'No'), (True, 'Yes')))
-    hydro_fracturing_yield_increase = models.DecimalField(
-        max_digits=7, decimal_places=2,
-        verbose_name='Well Yield Increase Due to Hydro-fracturing',
-        blank=True, null=True,
-        validators=[MinValueValidator(Decimal('0.00'))])
-
-    recommended_pump_depth = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True,
-                                                verbose_name='Recommended pump depth',
-                                                validators=[MinValueValidator(Decimal('0.00'))])
-    recommended_pump_rate = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True,
-                                                verbose_name='Recommended pump rate',
-                                                validators=[MinValueValidator(Decimal('0.00'))])
-
-    class Meta:
-        db_table = 'production_data'
-
-    def __str__(self):
-        if self.activity_submission:
-            return 'activity_submission {} {} {}'.format(
-                self.activity_submission, self.yield_estimation_method,
-                self.yield_estimation_rate)
-        else:
-            return 'well {} {} {}'.format(
-                self.well, self.yield_estimation_method,
-                self.yield_estimation_rate)
 
 
 class LinerPerforation(AuditModel):

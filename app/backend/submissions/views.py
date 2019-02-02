@@ -14,16 +14,23 @@
 
 from rest_framework.response import Response
 from posixpath import join as urljoin
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.urls import reverse
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 
+from gwells.documents import MinioClient
 from gwells.urls import app_root
 from gwells.pagination import APILimitOffsetPagination
 from wells.permissions import WellsEditPermissions
 from gwells.models import ProvinceStateCode
+from gwells.models.lithology import (
+    LithologyColourCode, LithologyHardnessCode,
+    LithologyMaterialCode, LithologyMoistureCode,)
 from gwells.serializers import ProvinceStateCodeSerializer
+from gwells.settings.base import get_env_variable
 from wells.models import (
     ActivitySubmission,
     CasingCode,
@@ -39,6 +46,7 @@ from wells.models import (
     IntendedWaterUseCode,
     LandDistrictCode,
     LinerMaterialCode,
+    ObsWellStatusCode,
     ScreenIntakeMethodCode,
     SurfaceSealMaterialCode,
     SurfaceSealMethodCode,
@@ -72,6 +80,11 @@ from submissions.serializers import (
     IntendedWaterUseCodeSerializer,
     LandDistrictSerializer,
     LinerMaterialCodeSerializer,
+    LithologyHardnessSerializer,
+    LithologyColourSerializer,
+    LithologyMaterialSerializer,
+    LithologyMoistureSerializer,
+    ObservationWellStatusCodeSerializer,
     ScreenIntakeMethodSerializer,
     SurfaceSealMaterialCodeSerializer,
     SurfaceSealMethodCodeSerializer,
@@ -101,7 +114,8 @@ def get_submission_queryset(qs):
                 "well_class",
                 "well_subclass",
                 "intended_water_use",
-                "driller_responsible",
+                "person_responsible",
+                'company_of_person_responsible',
                 "owner_province_state",
                 "ground_elevation_method",
                 "drilling_method",
@@ -113,7 +127,6 @@ def get_submission_queryset(qs):
                 "water_quality_characteristics",
                 "lithologydescription_set",
                 "linerperforation_set",
-                "productiondata_set",
                 "casing_set",
                 "screen_set",
                 "decommission_description_set",
@@ -299,6 +312,14 @@ class SubmissionsOptions(APIView):
         )
         coordinate_acquisition_codes = CoordinateAcquisitionCodeSerializer(
             instance=CoordinateAcquisitionCode.objects.all(), many=True)
+        observation_well_status = ObservationWellStatusCodeSerializer(
+            instance=ObsWellStatusCode.objects.all(), many=True
+        )
+
+        lithology_hardness = LithologyHardnessSerializer(instance=LithologyHardnessCode.objects.all(), many=True)
+        lithology_colours = LithologyColourSerializer(instance=LithologyColourCode.objects.all(), many=True)
+        lithology_materials = LithologyMaterialSerializer(instance=LithologyMaterialCode.objects.all(), many=True)
+        lithology_moisture = LithologyMoistureSerializer(instance=LithologyMoistureCode.objects.all(), many=True)
 
         root = urljoin('/', app_root, 'api/v1/')
         for item in activity_codes.data:
@@ -333,7 +354,12 @@ class SubmissionsOptions(APIView):
         options["yield_estimation_methods"] = yield_estimation_methods.data
         options["water_quality_characteristics"] = water_quality_characteristics.data
         options["water_quality_colours"] = water_quality_colours.data
-        options["well_status_codes"] = well_status_codes.data 
+        options["lithology_hardness_codes"] = lithology_hardness.data
+        options["lithology_colours"] = lithology_colours.data
+        options["lithology_materials"] = lithology_materials.data
+        options["lithology_moisture_codes"] = lithology_moisture.data
+        options["well_status_codes"] = well_status_codes.data
+        options["observation_well_status"] = observation_well_status.data
 
         return Response(options)
 
@@ -341,3 +367,26 @@ class SubmissionsOptions(APIView):
 class SubmissionsHomeView(TemplateView):
     """Loads the html file containing the Submissions web app"""
     template_name = 'submissions/submissions.html'
+
+
+class PreSignedDocumentKey(RetrieveAPIView):
+    """
+    Get a pre-signed document key to upload into an S3 compatible document store
+
+    post: obtain a URL that is pre-signed to allow client-side uploads
+    """
+
+    queryset = ActivitySubmission.objects.all()
+    permission_classes = (WellsEditPermissions,)
+
+    def get(self, request, submission_id):
+        submission = get_object_or_404(self.queryset, pk=submission_id)
+
+        client = MinioClient(
+            request=request, disable_private=True)
+
+        object_name = request.GET.get("filename")
+        filename = client.format_object_name(object_name, int(submission.well.well_tag_number), "well")
+        url = client.get_presigned_put_url(filename, bucket_name=get_env_variable("S3_ROOT_BUCKET"))
+
+        return JsonResponse({"object_name": object_name, "url": url})

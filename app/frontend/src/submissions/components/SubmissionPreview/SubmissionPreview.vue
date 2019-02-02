@@ -48,8 +48,9 @@ Licensed under the Apache License, Version 2.0 (the "License");
     <fieldset class="my-3 detail-section">
       <legend>Person Responsible for Work</legend>
       <b-row>
-        <b-col cols="12" lg="4"><span class="font-weight-bold">Person Responsible for Work:</span> {{ form.driller_responsible ? form.driller_responsible['name'] : '' }}</b-col>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Person Responsible for Work:</span> {{ form.person_responsible ? form.person_responsible['name'] : '' }}</b-col>
         <b-col cols="12" lg="4"><span class="font-weight-bold">Person Who Performed Work:</span> {{ form.driller_name }}</b-col>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Company of Person Responsible for Work:</span> {{ form.company_of_person_responsible ? form.company_of_person_responsible['org_verbose_name'] : '' }}</b-col>
       </b-row>
       <b-row>
         <b-col cols="12" lg="4"><span class="font-weight-bold">Consultant Name:</span> {{ form.consultant_name }}</b-col>
@@ -176,21 +177,25 @@ Licensed under the Apache License, Version 2.0 (the "License");
           striped
           small
           bordered
-          :items="filterBlankRows(form.lithology_set)"
+          :items="filterBlankRows(form.lithologydescription_set)"
           show-empty
           :fields="[
             'from',
             'to',
-            'primary',
-            'secondary',
-            'bedrock',
-            'descriptor',
+            'description',
             'colour',
             'hardness',
             'moisture',
-            'water_bearing_flow',
-            'observations'
-          ]"></b-table>
+            'water_bearing_estimated_flow',
+          ]">
+          <template slot="description" slot-scope="data">{{data.item.lithology_raw_data}}</template>
+          <template slot="from" slot-scope="data">{{data.item.lithology_from}}</template>
+          <template slot="to" slot-scope="data">{{data.item.lithology_to}}</template>
+          <template slot="colour" slot-scope="data">{{codeToDescription('lithology_colours', data.item.lithology_colour) }}</template>
+          <template slot="hardness" slot-scope="data">{{codeToDescription('lithology_hardness_codes', data.item.lithology_hardness) }}</template>
+          <template slot="moisture" slot-scope="data">{{codeToDescription('lithology_moisture_codes', data.item.lithology_moisture) }}</template>
+
+        </b-table>
       </div>
     </fieldset>
 
@@ -340,22 +345,19 @@ Licensed under the Apache License, Version 2.0 (the "License");
 
     <fieldset class="my-3 detail-section" v-if="sections.wellYield">
       <legend>Well Yield</legend>
-
-      <div v-for="(productionTest, index) in form.productiondata_set" :key="`ProductionDataSet${index}`">
-        <b-row>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Estimation Method:</span> {{codeToDescription('yield_estimation_methods', productionTest.yield_estimation_method)}} </b-col>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Estimation Rate:</span> {{productionTest.yield_estimation_rate}} </b-col>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Estimation Duration:</span> {{productionTest.yield_estimation_duration}}</b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Static Water Level Before Test:</span> {{productionTest.static_level}}</b-col>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Drawdown:</span> {{productionTest.drawdown}}</b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Hydrofracturing Performed:</span> {{productionTest.hydro_fracturing_performed}}</b-col>
-          <b-col cols="12" lg="4"><span class="font-weight-bold">Increase in Yield Due to Hydrofracturing:</span> {{productionTest.hydro_fracturing_yield_increase}}</b-col>
-        </b-row>
-      </div>
+      <b-row>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Estimation Method:</span> {{codeToDescription('yield_estimation_methods', form.yield_estimation_method)}} </b-col>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Estimation Rate:</span> {{form.yield_estimation_rate}} </b-col>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Estimation Duration:</span> {{form.yield_estimation_duration}}</b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Static Water Level Before Test:</span> {{form.static_level_before_test}}</b-col>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Drawdown:</span> {{form.drawdown}}</b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Hydrofracturing Performed:</span> {{form.hydro_fracturing_performed}}</b-col>
+        <b-col cols="12" lg="4"><span class="font-weight-bold">Increase in Yield Due to Hydrofracturing:</span> {{form.hydro_fracturing_yield_increase}}</b-col>
+      </b-row>
     </fieldset>
 
     <fieldset class="my-3 detail-section" v-if="sections.waterQuality">
@@ -425,6 +427,28 @@ Licensed under the Apache License, Version 2.0 (the "License");
       </p>
     </fieldset>
 
+    <fieldset v-if="upload_files && upload_files.length > 0">
+      <legend>Documents to Upload</legend>
+      <b-row>
+        <b-col cols="12" lg="4">
+          <b-list-group>
+            <b-list-group-item v-for="(f, index) in upload_files" :key="index">{{f.name}}</b-list-group-item>
+          </b-list-group>
+        </b-col>
+      </b-row>
+    </fieldset>
+
+    <fieldset v-if="uploadedFiles && uploadedFiles.public && uploadedFiles.public.length > 0">
+      <legend>Uploaded Documents</legend>
+      <b-row>
+        <b-col cols="12" lg="4">
+          <b-list-group>
+            <b-list-group-item v-for="(f, index) in uploadedFiles.public" :key="index">{{f.name}}</b-list-group-item>
+          </b-list-group>
+        </b-col>
+      </b-row>
+    </fieldset>
+
     <!-- Back / Next / Submit controls -->
     <b-row v-if="!reportSubmitted" class="mt-5">
       <b-col>
@@ -438,7 +462,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import CoordsMap from '@/submissions/components/SubmissionForm/CoordsMap.vue'
 import convertCoordinatesMixin from '@/common/convertCoordinatesMixin.js'
 import filterBlankRows from '@/common/filterBlankRows'
@@ -455,7 +479,8 @@ export default {
     'activity',
     'sections',
     'reportSubmitted',
-    'formSubmitLoading'
+    'formSubmitLoading',
+    'uploadedFiles'
   ],
   data () {
     return {
@@ -486,7 +511,10 @@ export default {
     // converts form lat/long and returns an object containing UTM easting, northing, and zone
       return this.convertToUTM(Number(this.form.longitude), Number(this.form.latitude))
     },
-    ...mapGetters(['codes'])
+    ...mapGetters(['codes']),
+    ...mapState('documentState', [
+      'upload_files'
+    ])
   }
 }
 </script>

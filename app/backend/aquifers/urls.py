@@ -25,6 +25,11 @@ urlpatterns = [
         name='aquifers-list-create'
         ),
 
+    url(r'^api/v1/aquifers/names/$',
+        never_cache(views.AquiferNameList.as_view()),
+        name='aquifer-name-list'
+        ),
+
     url(r'^api/v1/aquifers/(?P<aquifer_id>[0-9]+)/$',
         never_cache(views.AquiferRetrieveUpdateAPIView.as_view()),
         name='aquifer-retrieve-update'
@@ -33,6 +38,18 @@ urlpatterns = [
     # Documents (aquifer records)
     url(r'^api/v1/aquifers/(?P<aquifer_id>[0-9]+)/files$',
         never_cache(views.ListFiles.as_view()), name='aquifer-file-list'),
+
+    # Change history for an aquifer
+    url(r'^api/v1/aquifers/(?P<aquifer_id>[0-9]+)/history/$',
+        never_cache(views.AquiferHistory.as_view()), name='aquifer-history'),
+
+    # Document Uploading (aquifer records)
+    url(r'^api/v1/aquifers/(?P<aquifer_id>[0-9]+)/presigned_put_url$',
+        never_cache(views.PreSignedDocumentKey.as_view()), name='aquifer-pre-signed-url'),
+
+    # Document Deleting (aquifer records)
+    url(r'^api/v1/aquifers/(?P<aquifer_id>[0-9]+)/delete_document$',
+        never_cache(views.DeleteAquiferDocument.as_view()), name='aquifer-delete-document'),
 
     url(r'^api/v1/aquifer-codes/materials/$',
         cache_page(CACHE_TTL)(views.AquiferMaterialListAPIView.as_view()),

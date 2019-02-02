@@ -35,6 +35,7 @@ class Command(BaseCommand):
             if os.path.exists(filename):
                 os.remove(filename)
         logger.info('export complete')
+        self.stdout.write(self.style.SUCCESS('export complete'))
 
     def upload_files(self, zip_filename, spreadsheet_filename):
         minioClient = Minio(get_env_variable('S3_HOST'),
@@ -64,8 +65,12 @@ class Command(BaseCommand):
             cells = []
             # Write the headings
             for index, field in enumerate(cursor.description):
-                values.append(field.name)
-                cell = WriteOnlyCell(worksheet, value=field.name)
+                if isinstance(field, tuple):
+                    fieldName = field[0]
+                else:
+                    fieldName = field.name
+                values.append(fieldName)
+                cell = WriteOnlyCell(worksheet, value=fieldName)
                 cell.font = Font(bold=True)
                 cells.append(cell)
             columns = len(values)
@@ -119,13 +124,13 @@ class Command(BaseCommand):
  intended_water_use_code, licenced_status_code,
  observation_well_number, obs_well_status_code, water_supply_system_name,
  water_supply_system_well_name,
- street_address, city, legal_lot, legal_plan, legal_district_lot, legal_block,
+ well.street_address, well.city, legal_lot, legal_plan, legal_district_lot, legal_block,
  legal_section, legal_township, legal_range,
  land_district_code,
  legal_pid,
  well_location_description,
  latitude, longitude, utm_zone_code, utm_northing, utm_easting,
- utm_accuracy_code, bcgs_id,
+ coordinate_acquisition_code, bcgs_id,
  construction_start_date, construction_end_date, alteration_start_date,
  alteration_end_date, decommission_start_date, decommission_end_date,
  driller_name, consultant_name, consultant_company,
@@ -150,19 +155,26 @@ class Command(BaseCommand):
  filter_pack_material_size_code,
  development_hours, development_notes,
  water_quality_colour, water_quality_odour, ems_id,
+ yield_estimation_method_code,
+ yield_estimation_rate,
+ yield_estimation_duration, static_level_before_test, drawdown,
+ hydro_fracturing_performed, hydro_fracturing_yield_increase,
  decommission_reason, decommission_method_code, decommission_details, sealant_material,
  backfill_material,
  comments, aquifer_id,
  drilling_company.drilling_company_code,
  ems,
  aquifer_id,
- registries_person.surname as driller_responsible
+ registries_person.surname as person_responsible,
+ registries_organization.name as company_of_person_responsible
  from well
  left join well_subclass_code as wsc on wsc.well_subclass_guid = well.well_subclass_guid
  left join drilling_company on
  drilling_company.drilling_company_guid = well.drilling_company_guid
  left join registries_person on
- registries_person.person_guid = well.driller_responsible_guid
+ registries_person.person_guid = well.person_responsible_guid
+ left join registries_organization on
+ registries_organization.org_guid = well.org_of_person_responsible_guid
  order by well_tag_number""")
         ###########
         # LITHOLOGY
@@ -196,14 +208,6 @@ class Command(BaseCommand):
         screen_sql = ("""select well_tag_number, screen_from, screen_to, internal_diameter,
  screen_assembly_type_code, slot_size from screen
  order by well_tag_number""")
-        ############
-        # PRODUCTION
-        ############
-        production_sql = ("""select well_tag_number, yield_estimation_method_code, well_yield_unit_code,
- yield_estimation_rate,
- yield_estimation_duration, static_level, drawdown,
- hydro_fracturing_performed, hydro_fracturing_yield_increase from production_data
- order by well_tag_number""")
         ##############
         # PERFORATIONS
         ##############
@@ -235,10 +239,6 @@ class Command(BaseCommand):
             with connection.cursor() as cursor:
                 cursor.execute(screen_sql)
                 self.export(workbook, gwells_zip, 'screen', cursor)
-            # Production
-            with connection.cursor() as cursor:
-                cursor.execute(production_sql)
-                self.export(workbook, gwells_zip, 'production', cursor)
             # Perforation
             with connection.cursor() as cursor:
                 cursor.execute(perforation_sql)

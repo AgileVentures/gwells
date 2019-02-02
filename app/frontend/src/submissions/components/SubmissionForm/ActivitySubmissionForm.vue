@@ -105,7 +105,8 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :drillerName.sync="form.driller_name"
         :consultantName.sync="form.consultant_name"
         :consultantCompany.sync="form.consultant_company"
-        :personResponsible.sync="form.driller_responsible"
+        :personResponsible.sync="form.person_responsible"
+        :companyOfPersonResponsible.sync="form.company_of_person_responsible"
         :drillerSameAsPersonResponsible.sync="form.meta.drillerSameAsPersonResponsible"
         :errors="errors"
         :fieldsLoaded="fieldsLoaded"
@@ -152,6 +153,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :landDistrict.sync="form.land_district"
         :legalPID.sync="form.legal_pid"
         :wellLocationDescription.sync="form.well_location_description"
+        :errors="errors"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -165,6 +167,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :longitude.sync="form.longitude"
         :coordinateAcquisitionCode.sync="form.coordinate_acquisition_code"
         :isStaffEdit="isStaffEdit"
+        :errors="errors"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
       />
@@ -178,6 +181,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :drillingMethod.sync="form.drilling_method"
         :otherDrillingMethod.sync="form.other_drilling_method"
         :wellOrientation.sync="form.well_orientation"
+        :errors="errors"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -187,6 +191,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <closure-description class="my-5"
         v-if="showSection('closureDescription')"
         id="closureDescription"
+        :errors="errors"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -198,6 +203,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <lithology class="my-5"
         v-if="showSection('lithology')"
         id="lithology"
+        :errors="errors"
         :lithology.sync="form.lithologydescription_set"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
@@ -221,6 +227,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <backfill class="my-5"
         v-if="showSection('backfill')"
         id="backfill"
+        :errors="errors"
         :surfaceSealMaterial.sync="form.surface_seal_material"
         :surfaceSealDepth.sync="form.surface_seal_depth"
         :surfaceSealThickness.sync="form.surface_seal_thickness"
@@ -274,6 +281,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <filterPack class="my-5"
         v-if="showSection('filterPack')"
         id="filterPack"
+        :errors="errors"
         :filterPackFrom.sync="form.filter_pack_from"
         :filterPackTo.sync="form.filter_pack_to"
         :filterPackThickness.sync="form.filter_pack_thickness"
@@ -288,6 +296,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <development class="my-5"
         v-if="showSection('wellDevelopment')"
         id="wellDevelopment"
+        :errors="errors"
         :developmentMethod.sync="form.development_method"
         :developmentHours.sync="form.development_hours"
         :developmentNotes.sync="form.development_notes"
@@ -300,7 +309,16 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <yield class="my-5"
         v-if="showSection('wellYield')"
         id="wellYield"
-        :productionData.sync="form.productiondata_set"
+        :errors="errors"
+        :yieldEstimationMethod.sync="form.yield_estimation_method"
+        :yieldEstimationRate.sync="form.yield_estimation_rate"
+        :yieldEstimationDuration.sync="form.yield_estimation_duration"
+        :staticLevel.sync="form.static_level_before_test"
+        :drawdown.sync="form.drawdown"
+        :hydroFracturingPerformed.sync="form.hydro_fracturing_performed"
+        :hydroFracturingYieldIncrease.sync="form.hydro_fracturing_yield_increase"
+        :recommendedPumpDepth.sync="form.recommended_pump_depth"
+        :recommendedPumpRate.sync="form.recommended_pump_rate"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -314,6 +332,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :waterQualityColour.sync="form.water_quality_colour"
         :waterQualityOdour.sync="form.water_quality_odour"
         :emsID.sync="form.ems_id"
+        :errors="errors"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -333,6 +352,20 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :artesianPressure.sync="form.artesian_pressure"
         :wellCapType.sync="form.well_cap_type"
         :wellDisinfected.sync="form.well_disinfected"
+        :errors="errors"
+        :isStaffEdit="isStaffEdit"
+        :saveDisabled="editSaveDisabled"
+        v-on:save="$emit('submit_edit')"
+      />
+
+      <!-- Observation well info -->
+      <observation-well-info class="my-5"
+        v-if="showSection('observationWellInfo')"
+        id='observationWellInfo'
+        :obsWellNumber.sync="form.observation_well_number"
+        :obsWellStatus.sync="form.observation_well_status"
+        :errors="errors"
+        :fieldsLoaded="fieldsLoaded"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -347,6 +380,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :sealantMaterial.sync="form.sealant_material"
         :backfillMaterial.sync="form.backfill_material"
         :decommissionDetails.sync="form.decommission_details"
+        :errors="errors"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -359,6 +393,43 @@ Licensed under the Apache License, Version 2.0 (the "License");
         :comments.sync="form.comments"
         :internalComments.sync="form.internal_comments"
         :alternativeSpecsSubmitted.sync="form.alternative_specs_submitted"
+        :errors="errors"
+        :isStaffEdit="isStaffEdit"
+        :saveDisabled="editSaveDisabled"
+        v-on:save="$emit('submit_edit')"
+        v-on:setFormValueChanged="setFormValueChanged"
+      />
+
+      <!-- Documents -->
+      <documents class="my-5"
+        v-if="showSection('documents')"
+        id="files"
+        :uploadedFiles="uploadedFiles"
+        :isStaffEdit="isStaffEdit"
+        :saveDisabled="editSaveDisabled"
+        :showDocuments="form.well !== null"
+        :form="form"
+        v-on:save="$emit('submit_edit')"
+        v-on:setFormValueChanged="setFormValueChanged"
+        v-on:fetchFiles="fetchFiles"
+      />
+
+      <!-- aquifer -->
+      <aquifer-data class="my-5"
+        v-if="showSection('aquiferData')"
+        id="aquiferData"
+        :aquifer.sync="form.aquifer"
+        :aquiferVulnerabilityIndex.sync="form.aquifer_vulnerability_index"
+        :storativity.sync="form.storativity"
+        :transmissivity.sync="form.transmissivity"
+        :hydraulicConductivity.sync="form.hydraulic_conductivity"
+        :specificStorage.sync="form.specific_storage"
+        :specificYield.sync="form.specific_yield"
+        :testingMethod.sync="form.testing_method"
+        :testingDuration.sync="form.testing_duration"
+        :analyticSolutionType.sync="form.analytic_solution_type"
+        :boundaryEffect.sync="form.boundary_effect"
+        :errors="errors"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
         v-on:save="$emit('submit_edit')"
@@ -405,6 +476,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 
 <script>
 import ActivityType from './ActivityType.vue'
+import AquiferData from './AquiferData.vue'
 import WellType from './WellType.vue'
 import PersonResponsible from './PersonResponsible.vue'
 import Owner from './Owner.vue'
@@ -422,8 +494,10 @@ import Yield from './Yield.vue'
 import WaterQuality from './WaterQuality.vue'
 import Completion from './Completion.vue'
 import Comments from './Comments.vue'
+import Documents from './Documents.vue'
 import ClosureDescription from './ClosureDescription.vue'
 import DecommissionInformation from './DecommissionInformation.vue'
+import ObservationWellInfo from './ObservationWellInfo.vue'
 import inputBindingsMixin from '@/common/inputBindingsMixin.js'
 export default {
   name: 'SubmissionsForm',
@@ -466,10 +540,15 @@ export default {
     loading: {
       type: Boolean,
       isInput: false
+    },
+    uploadedFiles: {
+      type: Object,
+      isInput: false
     }
   },
   components: {
     ActivityType,
+    AquiferData,
     WellType,
     PersonResponsible,
     Owner,
@@ -487,8 +566,10 @@ export default {
     WaterQuality,
     Completion,
     Comments,
+    Documents,
     ClosureDescription,
-    DecommissionInformation
+    DecommissionInformation,
+    ObservationWellInfo
   },
   data () {
     return {
@@ -505,6 +586,7 @@ export default {
       fieldsLoaded: {},
       formStepDescriptions: {
         'activityType': 'Type of work',
+        'aquiferData': 'Well testing and aquifer details',
         'wellType': 'Well class',
         'wellOwner': 'Well owner',
         'wellLocation': 'Well location',
@@ -523,7 +605,8 @@ export default {
         'wellCompletion': 'Well completion data',
         'decommissionInformation': 'Well decommission information',
         'comments': 'Comments',
-        'personResponsible': 'Person Responsible for Work'
+        'personResponsible': 'Person responsible for work',
+        'observationWellInfo': 'Observation well information'
       }
     }
   },
@@ -561,13 +644,15 @@ export default {
       // saves a copy of form data locally
       this.saveStatusReset()
       const data = JSON.stringify(this.form)
-      localStorage.setItem('savedFormData', data)
+      if (window.localStorage) {
+        window.localStorage.setItem('savedFormData', data)
+      }
       setTimeout(() => { this.saveFormSuccess = true }, 10)
       setTimeout(() => { this.saveFormSuccess = false; this.hasHadSaveFormSuccess = true }, 1000)
     },
     loadForm () {
       this.saveStatusReset()
-      const storedData = localStorage.getItem('savedFormData')
+      const storedData = window.localStorage ? localStorage.getItem('savedFormData') : null
       if (storedData) {
         this.$emit('resetForm')
 
@@ -591,6 +676,12 @@ export default {
     saveStatusReset () {
       this.saveFormSuccess = false
       this.loadFormSuccess = false
+    },
+    setFormValueChanged () {
+      this.formValueChanged = true
+    },
+    fetchFiles () {
+      this.$emit('fetchFiles')
     }
   },
   created () {

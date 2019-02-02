@@ -14,6 +14,7 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from gwells.roles import AQUIFERS_EDIT_ROLE
 
+
 class HasAquiferEditRoleOrReadOnly(BasePermission):
     """
     Grants permission to users with Aquifer Edit Roles, or is a read-only request
@@ -22,6 +23,19 @@ class HasAquiferEditRoleOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS or
+            request.user and
+            request.user.is_authenticated and
+            request.user.groups.filter(name=AQUIFERS_EDIT_ROLE).exists()
+        )
+
+
+class HasAquiferEditRole(BasePermission):
+    """
+    Grants permission to users with Aquifer Edit Roles
+    """
+
+    def has_permission(self, request, view):
+        return (
             request.user and
             request.user.is_authenticated and
             request.user.groups.filter(name=AQUIFERS_EDIT_ROLE).exists()

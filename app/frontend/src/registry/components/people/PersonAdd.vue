@@ -118,6 +118,25 @@
                 </b-form-group>
               </b-col>
             </b-row>
+            <b-row class="mt-3"><b-col><h6 class="font-weight-bold">Attachments</h6></b-col></b-row>
+            <b-row class="mt-3">
+              <b-col>
+                <b-form-group
+                  horizontal
+                  label-cols="4"
+                  label="Documents">
+                  <b-form-file
+                    v-model="files"
+                    multiple
+                    plain/>
+                  <div class="mt-3" v-if="upload_files.length > 0">
+                    <b-list-group>
+                      <b-list-group-item v-for="(f, index) in upload_files" :key="index">{{f.name}}</b-list-group-item>
+                    </b-list-group>
+                  </div>
+                </b-form-group>
+              </b-col>
+            </b-row>
             <b-card no-body class="mb-3 p-1 p-md-3" v-if="drillerForm.regType.some(x => x === 'DRILL' || x === 'PUMP')">
               <b-row>
                   <b-col>
@@ -269,7 +288,7 @@
 
 <script>
 import APIErrorMessage from '@/common/components/APIErrorMessage'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ApiService from '@/common/services/ApiService.js'
 import OrganizationAdd from '@/registry/components/people/OrganizationAdd.vue'
 import ApplicationAddEdit from '@/registry/components/people/ApplicationAddEdit.vue'
@@ -344,12 +363,30 @@ export default {
         contact_email: (this.fieldErrors.contact_email && this.fieldErrors.contact_email.length) ? false : null
       }
     },
+    files: {
+      get: function () {
+        return this.upload_files
+      },
+      set: function (value) {
+        this.setFiles(value)
+      }
+    },
     ...mapGetters([
       'loading',
       'error'
+    ]),
+    ...mapState('documentState', [
+      'upload_files'
     ])
   },
   methods: {
+    ...mapActions('documentState', [
+      'uploadFiles',
+      'fileUploadSuccess'
+    ]),
+    ...mapMutations('documentState', [
+      'setFiles'
+    ]),
     clearFieldErrors () {
       this.fieldErrors = {
         contact_email: []
@@ -396,14 +433,27 @@ export default {
       personData['registrations'] = registrations
 
       ApiService.post('drillers', personData).then((response) => {
-        this.onFormReset()
-        this.$router.push({ name: 'PersonDetail', params: { person_guid: response.data.person_guid } })
-      }).catch((e) => {
-        const errors = e.response.data
-        for (const field in errors) {
-          this.fieldErrors[field] = errors[field]
+        if (this.upload_files.length > 0) {
+          this.uploadFiles({
+            documentType: 'drillers',
+            recordId: response.data.person_guid
+          }).then(() => {
+            this.fileUploadSuccess()
+            this.$router.push({ name: 'PersonDetail', params: { person_guid: response.data.person_guid } })
+          }).catch((error) => {
+            console.log(error)
+          })
+        } else {
+          this.$router.push({ name: 'PersonDetail', params: { person_guid: response.data.person_guid } })
         }
+        this.onFormReset()
       })
+        .catch((e) => {
+          const errors = e.response.data
+          for (const field in errors) {
+            this.fieldErrors[field] = errors[field]
+          }
+        })
     },
     onFormReset () {
       this.clearFieldErrors()

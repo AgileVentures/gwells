@@ -8,6 +8,12 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
    
   <!---->
    
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
   <div
     class="container"
   >
@@ -19,9 +25,9 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
       <div
         class="col"
       >
-        <h5>
+        <h4>
           Aquifer 4 Summary - Edit
-        </h5>
+        </h4>
       </div>
     </div>
      
@@ -57,39 +63,6 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
           </div>
            
           <div
-            aria-labelledby="__BVID__49__BV_label_"
-            class="b-form-group form-group"
-            id="__BVID__49"
-            role="group"
-          >
-            <div
-              class="form-row"
-            >
-              <label
-                class="col-sm-4 col-form-label"
-                for="aquifer_name"
-                id="__BVID__49__BV_label_"
-              >
-                Aquifer name
-              </label>
-              <div
-                class="col-sm-8"
-              >
-                <input
-                  class="form-control"
-                  id="aquifer_name"
-                  tabindex="1"
-                  type="text"
-                  value="Aggasiz"
-                />
-                <!---->
-                <!---->
-                <!---->
-              </div>
-            </div>
-          </div>
-           
-          <div
             aria-labelledby="__BVID__51__BV_label_"
             class="b-form-group form-group"
             id="__BVID__51"
@@ -100,20 +73,20 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="location_description"
+                for="aquifer_name"
                 id="__BVID__51__BV_label_"
               >
-                Descriptive location
+                Aquifer name
               </label>
               <div
                 class="col-sm-8"
               >
                 <input
                   class="form-control"
-                  id="location_description"
-                  tabindex="3"
+                  id="aquifer-name"
+                  tabindex="1"
                   type="text"
-                  value="Aggasiz/Sea Bird Island"
+                  value="Aggasiz"
                 />
                 <!---->
                 <!---->
@@ -133,23 +106,21 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="material"
+                for="location_description"
                 id="__BVID__53__BV_label_"
               >
-                Material type
+                Descriptive location
               </label>
               <div
                 class="col-sm-8"
               >
-                <select
-                  class="form-control custom-select"
-                  id="material"
-                  tabindex="5"
-                >
-                  <option
-                    value=""
-                  />
-                </select>
+                <input
+                  class="form-control"
+                  id="aquifer-location-description"
+                  tabindex="3"
+                  type="text"
+                  value="Aggasiz/Sea Bird Island"
+                />
                 <!---->
                 <!---->
                 <!---->
@@ -168,18 +139,18 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="quality_concern"
+                for="material"
                 id="__BVID__55__BV_label_"
               >
-                Quality concerns
+                Material type
               </label>
               <div
                 class="col-sm-8"
               >
                 <select
                   class="form-control custom-select"
-                  id="quality_concern"
-                  tabindex="7"
+                  id="aquifer-material"
+                  tabindex="5"
                 >
                   <option
                     value=""
@@ -203,21 +174,23 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="area"
+                for="quality_concern"
                 id="__BVID__57__BV_label_"
               >
-                Size (km²)
+                Quality concerns
               </label>
               <div
                 class="col-sm-8"
               >
-                <input
-                  class="form-control"
-                  id="area"
-                  tabindex="9"
-                  type="text"
-                  value="63.3"
-                />
+                <select
+                  class="form-control custom-select"
+                  id="aquifer-quality-concern"
+                  tabindex="7"
+                >
+                  <option
+                    value=""
+                  />
+                </select>
                 <!---->
                 <!---->
                 <!---->
@@ -236,23 +209,21 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="known_water_use"
+                for="area"
                 id="__BVID__59__BV_label_"
               >
-                Type of known water use
+                Size (km²)
               </label>
               <div
                 class="col-sm-8"
               >
-                <select
-                  class="form-control custom-select"
-                  id="known_water_use"
-                  tabindex="11"
-                >
-                  <option
-                    value=""
-                  />
-                </select>
+                <input
+                  class="form-control"
+                  id="aquifer-area"
+                  tabindex="9"
+                  type="text"
+                  value="63.3"
+                />
                 <!---->
                 <!---->
                 <!---->
@@ -271,32 +242,30 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="notes"
+                for="known_water_use"
                 id="__BVID__61__BV_label_"
               >
-                Comments
+                Type of known water use
               </label>
               <div
                 class="col-sm-8"
               >
-                <textarea
-                  class="form-control"
-                  id="notes"
-                  rows="4"
-                  tabindex="13"
-                  wrap="soft"
-                />
+                <select
+                  class="form-control custom-select"
+                  id="aquifer-known-water-use"
+                  tabindex="11"
+                >
+                  <option
+                    value=""
+                  />
+                </select>
                 <!---->
                 <!---->
                 <!---->
               </div>
             </div>
           </div>
-        </div>
-         
-        <div
-          class="col-md-6"
-        >
+           
           <div
             aria-labelledby="__BVID__63__BV_label_"
             class="b-form-group form-group"
@@ -308,20 +277,20 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="mapping_year"
+                for="notes"
                 id="__BVID__63__BV_label_"
               >
-                Year of mapping
+                Comments
               </label>
               <div
                 class="col-sm-8"
               >
-                <input
+                <textarea
                   class="form-control"
-                  id="mapping_year"
-                  tabindex="2"
-                  type="text"
-                  value="1993"
+                  id="aquifer-notes"
+                  rows="4"
+                  tabindex="13"
+                  wrap="soft"
                 />
                 <!---->
                 <!---->
@@ -330,7 +299,7 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             </div>
           </div>
            
-          <div
+          <fieldset
             aria-labelledby="__BVID__65__BV_label_"
             class="b-form-group form-group"
             id="__BVID__65"
@@ -339,30 +308,36 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             <div
               class="form-row"
             >
-              <label
+              <legend
                 class="col-sm-4 col-form-label"
-                for="litho_stratographic_unit"
                 id="__BVID__65__BV_label_"
               >
-                Litho stratigraphic unit
-              </label>
+                Documents
+              </legend>
               <div
+                aria-labelledby="__BVID__65__BV_label_"
                 class="col-sm-8"
+                role="group"
               >
                 <input
-                  class="form-control"
-                  id="litho_stratographic_unit"
-                  tabindex="4"
-                  type="text"
-                  value="Fraser River Sediments"
+                  class="form-control-file"
+                  id="__BVID__66"
+                  multiple="multiple"
+                  type="file"
                 />
+                 
+                <!---->
                 <!---->
                 <!---->
                 <!---->
               </div>
             </div>
-          </div>
-           
+          </fieldset>
+        </div>
+         
+        <div
+          class="col-md-6"
+        >
           <div
             aria-labelledby="__BVID__67__BV_label_"
             class="b-form-group form-group"
@@ -374,23 +349,21 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="vulnerability"
+                for="mapping_year"
                 id="__BVID__67__BV_label_"
               >
-                Vulnerability
+                Year of mapping
               </label>
               <div
                 class="col-sm-8"
               >
-                <select
-                  class="form-control custom-select"
-                  id="vulnerability"
-                  tabindex="6"
-                >
-                  <option
-                    value=""
-                  />
-                </select>
+                <input
+                  class="form-control"
+                  id="aquifer-mapping-year"
+                  tabindex="2"
+                  type="text"
+                  value="1993"
+                />
                 <!---->
                 <!---->
                 <!---->
@@ -409,23 +382,21 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="subtype"
+                for="litho_stratographic_unit"
                 id="__BVID__69__BV_label_"
               >
-                Subtype
+                Litho stratigraphic unit
               </label>
               <div
                 class="col-sm-8"
               >
-                <select
-                  class="form-control custom-select"
-                  id="subtype"
-                  tabindex="8"
-                >
-                  <option
-                    value=""
-                  />
-                </select>
+                <input
+                  class="form-control"
+                  id="aquifer-litho-stratigraphic-unit"
+                  tabindex="4"
+                  type="text"
+                  value="Fraser River Sediments"
+                />
                 <!---->
                 <!---->
                 <!---->
@@ -444,18 +415,18 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="productivity"
+                for="vulnerability"
                 id="__BVID__71__BV_label_"
               >
-                Productivity
+                Vulnerability
               </label>
               <div
                 class="col-sm-8"
               >
                 <select
                   class="form-control custom-select"
-                  id="productivity"
-                  tabindex="10"
+                  id="aquifer-vulnerability"
+                  tabindex="6"
                 >
                   <option
                     value=""
@@ -479,8 +450,78 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="demand"
+                for="subtype"
                 id="__BVID__73__BV_label_"
+              >
+                Subtype
+              </label>
+              <div
+                class="col-sm-8"
+              >
+                <select
+                  class="form-control custom-select"
+                  id="aquifer-subtype"
+                  tabindex="8"
+                >
+                  <option
+                    value=""
+                  />
+                </select>
+                <!---->
+                <!---->
+                <!---->
+              </div>
+            </div>
+          </div>
+           
+          <div
+            aria-labelledby="__BVID__75__BV_label_"
+            class="b-form-group form-group"
+            id="__BVID__75"
+            role="group"
+          >
+            <div
+              class="form-row"
+            >
+              <label
+                class="col-sm-4 col-form-label"
+                for="productivity"
+                id="__BVID__75__BV_label_"
+              >
+                Productivity
+              </label>
+              <div
+                class="col-sm-8"
+              >
+                <select
+                  class="form-control custom-select"
+                  id="aquifer-productivity"
+                  tabindex="10"
+                >
+                  <option
+                    value=""
+                  />
+                </select>
+                <!---->
+                <!---->
+                <!---->
+              </div>
+            </div>
+          </div>
+           
+          <div
+            aria-labelledby="__BVID__77__BV_label_"
+            class="b-form-group form-group"
+            id="__BVID__77"
+            role="group"
+          >
+            <div
+              class="form-row"
+            >
+              <label
+                class="col-sm-4 col-form-label"
+                for="demand"
+                id="__BVID__77__BV_label_"
               >
                 Demand
               </label>
@@ -489,7 +530,7 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
               >
                 <select
                   class="form-control custom-select"
-                  id="demand"
+                  id="aquifer-demand"
                   tabindex="12"
                 >
                   <option
@@ -676,7 +717,12 @@ exports[`View Component Edit mode matches the snapshot 1`] = `
       Documentation
     </h5>
      
-    <aquifer-documents-stub />
+    <aquifer-documents-stub
+      editmode="true"
+      files="[object Object]"
+    />
+     
+    <!---->
   </div>
 </div>
 `;
@@ -685,6 +731,12 @@ exports[`View Component View mode matches the snapshot 1`] = `
 <div
   class="card p-3 mb-4"
 >
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
   <!---->
    
   <!---->
@@ -700,9 +752,9 @@ exports[`View Component View mode matches the snapshot 1`] = `
       <div
         class="col"
       >
-        <h5>
+        <h4>
           Aquifer 4 Summary - Edit
-        </h5>
+        </h4>
       </div>
     </div>
      
@@ -758,7 +810,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <input
                   class="form-control"
-                  id="aquifer_name"
+                  id="aquifer-name"
                   tabindex="1"
                   type="text"
                   value="Aggasiz"
@@ -791,7 +843,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <input
                   class="form-control"
-                  id="location_description"
+                  id="aquifer-location-description"
                   tabindex="3"
                   type="text"
                   value="Aggasiz/Sea Bird Island"
@@ -824,7 +876,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <select
                   class="form-control custom-select"
-                  id="material"
+                  id="aquifer-material"
                   tabindex="5"
                 >
                   <option
@@ -859,7 +911,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <select
                   class="form-control custom-select"
-                  id="quality_concern"
+                  id="aquifer-quality-concern"
                   tabindex="7"
                 >
                   <option
@@ -894,7 +946,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <input
                   class="form-control"
-                  id="area"
+                  id="aquifer-area"
                   tabindex="9"
                   type="text"
                   value="63.3"
@@ -927,7 +979,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <select
                   class="form-control custom-select"
-                  id="known_water_use"
+                  id="aquifer-known-water-use"
                   tabindex="11"
                 >
                   <option
@@ -962,7 +1014,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <textarea
                   class="form-control"
-                  id="notes"
+                  id="aquifer-notes"
                   rows="4"
                   tabindex="13"
                   wrap="soft"
@@ -973,12 +1025,8 @@ exports[`View Component View mode matches the snapshot 1`] = `
               </div>
             </div>
           </div>
-        </div>
-         
-        <div
-          class="col-md-6"
-        >
-          <div
+           
+          <fieldset
             aria-labelledby="__BVID__26__BV_label_"
             class="b-form-group form-group"
             id="__BVID__26"
@@ -987,30 +1035,36 @@ exports[`View Component View mode matches the snapshot 1`] = `
             <div
               class="form-row"
             >
-              <label
+              <legend
                 class="col-sm-4 col-form-label"
-                for="mapping_year"
                 id="__BVID__26__BV_label_"
               >
-                Year of mapping
-              </label>
+                Documents
+              </legend>
               <div
+                aria-labelledby="__BVID__26__BV_label_"
                 class="col-sm-8"
+                role="group"
               >
                 <input
-                  class="form-control"
-                  id="mapping_year"
-                  tabindex="2"
-                  type="text"
-                  value="1993"
+                  class="form-control-file"
+                  id="__BVID__27"
+                  multiple="multiple"
+                  type="file"
                 />
+                 
+                <!---->
                 <!---->
                 <!---->
                 <!---->
               </div>
             </div>
-          </div>
-           
+          </fieldset>
+        </div>
+         
+        <div
+          class="col-md-6"
+        >
           <div
             aria-labelledby="__BVID__28__BV_label_"
             class="b-form-group form-group"
@@ -1022,20 +1076,20 @@ exports[`View Component View mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="litho_stratographic_unit"
+                for="mapping_year"
                 id="__BVID__28__BV_label_"
               >
-                Litho stratigraphic unit
+                Year of mapping
               </label>
               <div
                 class="col-sm-8"
               >
                 <input
                   class="form-control"
-                  id="litho_stratographic_unit"
-                  tabindex="4"
+                  id="aquifer-mapping-year"
+                  tabindex="2"
                   type="text"
-                  value="Fraser River Sediments"
+                  value="1993"
                 />
                 <!---->
                 <!---->
@@ -1055,23 +1109,21 @@ exports[`View Component View mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="vulnerability"
+                for="litho_stratographic_unit"
                 id="__BVID__30__BV_label_"
               >
-                Vulnerability
+                Litho stratigraphic unit
               </label>
               <div
                 class="col-sm-8"
               >
-                <select
-                  class="form-control custom-select"
-                  id="vulnerability"
-                  tabindex="6"
-                >
-                  <option
-                    value=""
-                  />
-                </select>
+                <input
+                  class="form-control"
+                  id="aquifer-litho-stratigraphic-unit"
+                  tabindex="4"
+                  type="text"
+                  value="Fraser River Sediments"
+                />
                 <!---->
                 <!---->
                 <!---->
@@ -1090,18 +1142,18 @@ exports[`View Component View mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="subtype"
+                for="vulnerability"
                 id="__BVID__32__BV_label_"
               >
-                Subtype
+                Vulnerability
               </label>
               <div
                 class="col-sm-8"
               >
                 <select
                   class="form-control custom-select"
-                  id="subtype"
-                  tabindex="8"
+                  id="aquifer-vulnerability"
+                  tabindex="6"
                 >
                   <option
                     value=""
@@ -1125,18 +1177,18 @@ exports[`View Component View mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="productivity"
+                for="subtype"
                 id="__BVID__34__BV_label_"
               >
-                Productivity
+                Subtype
               </label>
               <div
                 class="col-sm-8"
               >
                 <select
                   class="form-control custom-select"
-                  id="productivity"
-                  tabindex="10"
+                  id="aquifer-subtype"
+                  tabindex="8"
                 >
                   <option
                     value=""
@@ -1160,8 +1212,43 @@ exports[`View Component View mode matches the snapshot 1`] = `
             >
               <label
                 class="col-sm-4 col-form-label"
-                for="demand"
+                for="productivity"
                 id="__BVID__36__BV_label_"
+              >
+                Productivity
+              </label>
+              <div
+                class="col-sm-8"
+              >
+                <select
+                  class="form-control custom-select"
+                  id="aquifer-productivity"
+                  tabindex="10"
+                >
+                  <option
+                    value=""
+                  />
+                </select>
+                <!---->
+                <!---->
+                <!---->
+              </div>
+            </div>
+          </div>
+           
+          <div
+            aria-labelledby="__BVID__38__BV_label_"
+            class="b-form-group form-group"
+            id="__BVID__38"
+            role="group"
+          >
+            <div
+              class="form-row"
+            >
+              <label
+                class="col-sm-4 col-form-label"
+                for="demand"
+                id="__BVID__38__BV_label_"
               >
                 Demand
               </label>
@@ -1170,7 +1257,7 @@ exports[`View Component View mode matches the snapshot 1`] = `
               >
                 <select
                   class="form-control custom-select"
-                  id="demand"
+                  id="aquifer-demand"
                   tabindex="12"
                 >
                   <option
@@ -1357,7 +1444,12 @@ exports[`View Component View mode matches the snapshot 1`] = `
       Documentation
     </h5>
      
-    <aquifer-documents-stub />
+    <aquifer-documents-stub
+      editmode="true"
+      files="[object Object]"
+    />
+     
+    <!---->
   </div>
 </div>
 `;
