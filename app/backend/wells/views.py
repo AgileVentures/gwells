@@ -26,6 +26,8 @@ from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 
 from drf_yasg.utils import swagger_auto_schema
 
+from django_filters import rest_framework as restfilters
+
 from minio import Minio
 
 from gwells import settings
@@ -35,6 +37,7 @@ from gwells.roles import WELLS_VIEWER_ROLE, WELLS_EDIT_ROLE
 from gwells.pagination import APILimitOffsetPagination
 from gwells.settings.base import get_env_variable
 
+from wells.filters import WellSearchFilter
 from wells.models import Well
 from wells.serializers import (
     WellListSerializer,
@@ -154,6 +157,13 @@ class WellListAPIView(ListAPIView):
     queryset = Well.objects.all()
     pagination_class = APILimitOffsetPagination
     serializer_class = WellListSerializer
+
+    filter_backends = (restfilters.DjangoFilterBackend,
+                       filters.SearchFilter, filters.OrderingFilter)
+    ordering = ('well_tag_number',)
+    filterset_class = WellSearchFilter
+    search_fields = ('well_tag_number', 'identification_plate_number',
+                     'street_address', 'city', 'owner_full_name')
 
     def get_queryset(self):
         qs = self.queryset
