@@ -43,7 +43,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
     <div v-else>
       <b-row v-if="isStaffEdit">
           <b-col lg="3" v-for="step in formSteps[activityType]" :key='step'>
-            <a :href="'#' + step">{{formStepDescriptions[step] ? formStepDescriptions[step] : step}}</a>
+            <a href="#" @click="anchorLinkHandler(step)">{{formStepDescriptions[step] ? formStepDescriptions[step] : step}}</a>
           </b-col>
         </b-row>
       <p v-if="!isStaffEdit">Submit activity on a well. <a href="/gwells/">Try a search</a> to see if the well exists in the system before submitting a report.</p>
@@ -178,8 +178,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         id="method"
         :groundElevation.sync="form.ground_elevation"
         :groundElevationMethod.sync="form.ground_elevation_method"
-        :drillingMethod.sync="form.drilling_method"
-        :otherDrillingMethod.sync="form.other_drilling_method"
+        :drillingMethod.sync="form.drilling_methods"
         :wellOrientation.sync="form.well_orientation"
         :errors="errors"
         :isStaffEdit="isStaffEdit"
@@ -297,7 +296,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
         v-if="showSection('wellDevelopment')"
         id="wellDevelopment"
         :errors="errors"
-        :developmentMethod.sync="form.development_method"
+        :developmentMethod.sync="form.development_methods"
         :developmentHours.sync="form.development_hours"
         :developmentNotes.sync="form.development_notes"
         :isStaffEdit="isStaffEdit"
@@ -403,7 +402,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
       <!-- Documents -->
       <documents class="my-5"
         v-if="showSection('documents')"
-        id="files"
+        id="documents"
         :uploadedFiles="uploadedFiles"
         :isStaffEdit="isStaffEdit"
         :saveDisabled="editSaveDisabled"
@@ -606,7 +605,8 @@ export default {
         'decommissionInformation': 'Well decommission information',
         'comments': 'Comments',
         'personResponsible': 'Person responsible for work',
-        'observationWellInfo': 'Observation well information'
+        'observationWellInfo': 'Observation well information',
+        'documents': 'Attachments'
       }
     }
   },
@@ -682,6 +682,9 @@ export default {
     },
     fetchFiles () {
       this.$emit('fetchFiles')
+    },
+    anchorLinkHandler (step) {
+      this.$SmoothScroll(this.$el.querySelector(`#${step}`))
     }
   },
   created () {
